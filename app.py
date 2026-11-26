@@ -17,9 +17,29 @@ with st.sidebar:
     st.header('Your Details')
     sex = st.radio('Sex', ['Male', 'Female'], horizontal=True)
     age = st.slider('Age', 10, 90, 25)
-    feet = st.number_input('Height (feet)', 3, 7, 5)
-    inch = st.number_input('Height (inch)', 0, 11, 0)
-    height_cm = feet * 30.48 + inch * 2.54
+
+    unit = st.radio('Height unit', ['cm', 'meter', 'feet'], horizontal=True)
+
+    if unit == 'cm':
+        height_cm = st.number_input('Height (cm)', 120.0, 220.0, 152.0)
+    elif unit == 'meter':
+        height_m = st.number_input('Height (meter)', 1.20, 2.20, 1.52, step=0.01)
+        height_cm = height_m * 100
+    else:
+        ft_text = st.text_input('Height (feet.inch)', '5.0',
+                                help='5.1 means 5 feet 1 inch, 5.10 means 5 feet 10 inch')
+        try:
+            parts = ft_text.strip().split('.')
+            f = int(parts[0])
+            i = int(parts[1]) if len(parts) > 1 and parts[1] != '' else 0
+            if not (4 <= f <= 7) or not (0 <= i <= 11):
+                raise ValueError
+            height_cm = f * 30.48 + i * 2.54
+        except ValueError:
+            st.error('Type feet like 5.1 (5 ft 1 in). Inches must be 0 to 11.')
+            st.stop()
+
+
     weight = st.number_input('Weight (kg)', 30.0, 200.0, 55.0)
     hyp = st.radio('Hypertension', ['No', 'Yes'], horizontal=True)
     dia = st.radio('Diabetes', ['No', 'Yes'], horizontal=True)
